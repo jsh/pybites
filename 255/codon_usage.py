@@ -1,13 +1,12 @@
+#!/usr/bin/env python3
 """Print codon usage statistics."""
-# TODO: janitorial work: pep257, isort, black, pylint, mypy
-# TODO: read in sequence
+
 # TODO: convert T->U
 # TODO: print out a codon at a time
-# TODO: find out what M, * mean.
-# TODO: convert tranlation table to table[codon] = [starts, AAs]
 
 import os
-from typing import List
+import re
+from typing import Dict, List, Tuple
 from urllib.request import urlretrieve
 
 # Translation Table:
@@ -41,6 +40,25 @@ def _preload_sequences(url: str = URL) -> List[str]:
         return f_seq.readlines()
 
 
+def translation_table_to_dict(translation_table: str) -> Dict[str, Tuple[str, str]]:
+    """Convert translation table to {codon: (AA, Start)}."""
+    codons = [
+        "".join([f, s, t]) for f in BASE_ORDER for s in BASE_ORDER for t in BASE_ORDER
+    ]
+    pat = re.compile(r"(\S+)\s+=\s+(\S+)")
+    transl_rows = re.findall(pat, translation_table)
+    transl_dict = {entry[0]: entry[1] for entry in transl_rows}
+    assert (
+        len(transl_dict["AAs"])
+        == len(transl_dict["Starts"])
+        == len(transl_dict["Base1"])
+        == len(transl_dict["Base2"])
+        == len(transl_dict["Base3"])
+        == len(codons)
+    )
+    return dict(zip(codons, zip(transl_dict["AAs"], transl_dict["Starts"])))
+
+
 def return_codon_usage_table(
     sequences: List[str] = _preload_sequences(),
     translation_table_str: str = TRANSL_TABLE_11,
@@ -58,4 +76,5 @@ def return_codon_usage_table(
 
 
 if __name__ == "__main__":
-    print(return_codon_usage_table())
+    for codon, val in translation_table_to_dict(TRANSL_TABLE_11).items():
+        print(codon, val)
