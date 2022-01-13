@@ -1,4 +1,5 @@
-# TODO: janitorial work
+"""Print codon usage statistics."""
+# TODO: janitorial work: pep257, isort, black, pylint, mypy
 # TODO: read in sequence
 # TODO: convert T->U
 # TODO: print out a codon at a time
@@ -6,6 +7,7 @@
 # TODO: convert tranlation table to table[codon] = [starts, AAs]
 
 import os
+from typing import List
 from urllib.request import urlretrieve
 
 # Translation Table:
@@ -27,22 +29,24 @@ URL = "https://bites-data.s3.us-east-2.amazonaws.com/NC_009641.txt"
 BASE_ORDER = ["U", "C", "A", "G"]
 
 
-def _preload_sequences(url=URL):
-    """
+def _preload_sequences(url: str = URL) -> List[str]:
+    """Return coding sequences, one sequence each line.
+
     Provided helper function
-    Returns coding sequences, one sequence each line
     """
     filename = os.path.join(os.getenv("TMP", "/tmp"), "NC_009641.txt")
     if not os.path.isfile(filename):
         urlretrieve(url, filename)
-    with open(filename, "r") as f:
-        return f.readlines()    
+    with open(filename, "r", encoding="utf-8") as f_seq:
+        return f_seq.readlines()
 
 
 def return_codon_usage_table(
-    sequences=_preload_sequences(), translation_table_str=TRANSL_TABLE_11
-):
-    """
+    sequences: List[str] = _preload_sequences(),
+    translation_table_str: str = TRANSL_TABLE_11,
+) -> str:
+    """Convert sequence and tranlation table to table of bases and frequencies.
+
     Receives a list of gene sequences and a translation table string
     Returns a string with all bases and their frequencies in a table
     with the following fields:
@@ -51,7 +55,6 @@ def return_codon_usage_table(
     Skip invalid coding sequences:
        --> must consist entirely of codons (3-base triplet)
     """
-    pass
 
 
 if __name__ == "__main__":
