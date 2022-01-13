@@ -1,3 +1,10 @@
+# TODO: janitorial work
+# TODO: read in sequence
+# TODO: convert T->U
+# TODO: print out a codon at a time
+# TODO: find out what M, * mean.
+# TODO: convert tranlation table to table[codon] = [starts, AAs]
+
 import os
 from urllib.request import urlretrieve
 
