@@ -40,7 +40,7 @@ def _preload_sequences(url: str = URL) -> List[str]:
         return f_seq.readlines()
 
 
-def translation_table_to_dict(translation_table: str) -> Dict[str, Tuple[str, str]]:
+def _translation_table_to_dict(translation_table: str) -> Dict[str, Tuple[str, str]]:
     """Convert translation table to {codon: (AA, Start)}."""
     codons = [
         "".join([f, s, t]) for f in BASE_ORDER for s in BASE_ORDER for t in BASE_ORDER
@@ -73,8 +73,32 @@ def return_codon_usage_table(
     Skip invalid coding sequences:
        --> must consist entirely of codons (3-base triplet)
     """
+    table_dict = _translation_table_to_dict(translation_table_str)
+    sequences = [sequence.strip() for sequence in sequences]
+    assert 1 not in [len(sequence) % 3 for sequence in sequences]
+    codons = {}
+    for sequence in sequences:
+        for pos in range(0, len(sequence), 3):
+            codon = sequence[pos:pos+3]
+            if codon not in codons:
+                codons[codon] = 0
+            codons[codon] += 1
+    total_codons = sum(codons.values())
+    codon_dict = _translation_table_to_dict(TRANSL_TABLE_11)
+    codon_list = list(codon_dict.keys())
 
+    divider = "---------------------------------------------------------------------------------------------------------\n"
+    codon_usage_table = "|  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |\n"
+    codon_usage_table += divider
+    for codon in sorted(codons, key=codon_list.index):
+        aa = codon_dict[codon][0]
+        number = codons[codon]
+        freq_per_1000 = round((number/total_codons)*1000, 1)
+        codon_usage_table += f"| {codon}: {aa} {freq_per_1000} {number} "
+        if codon_list.index(codon) % 16 == 15:
+            codon_usage_table += "|\n"
+            codon_usage_table += divider
+    return codon_usage_table
 
 if __name__ == "__main__":
-    for codon, val in translation_table_to_dict(TRANSL_TABLE_11).items():
-        print(codon, val)
+    print(return_codon_usage_table())
