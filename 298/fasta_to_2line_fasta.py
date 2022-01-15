@@ -3,7 +3,6 @@
 
 import os
 import urllib
-from typing import List
 
 from Bio import SeqIO
 
@@ -15,13 +14,6 @@ if not os.path.isfile(FASTA_FILE):
     urllib.request.urlretrieve(URL, FASTA_FILE)
 
 
-def _append_2_line_fasta(two_line_fasta: List[str], fasta_list: List[str]) -> List[str]:
-    """Append two_line_fasta to fasta_list."""
-    assert len(two_line_fasta) == 2, two_line_fasta
-    fasta_list += two_line_fasta
-    return fasta_list
-
-
 def fasta_to_2line_fasta(fasta_file: str, fasta_2line_file: str) -> int:
     """Convert multi-line fasta_file to 2-line fasta file.
 
@@ -29,26 +21,13 @@ def fasta_to_2line_fasta(fasta_file: str, fasta_2line_file: str) -> int:
     :param fasta_2line_file: Filename of 2-line FASTA file
     :return: Number of records
     """
-    # initialize lists
-    fasta_list: List[str] = []
-    two_line_fasta: List[str] = []
-    with open(fasta_file, "r", encoding="utf-8") as f_in:
-        for line in f_in:
-            if line[0] == ">":
-                if two_line_fasta:
-                    two_line_fasta[1] += "\n"
-                    _append_2_line_fasta(two_line_fasta, fasta_list)
-                # re-initialize
-                two_line_fasta = [line, ""]
-            else:
-                two_line_fasta[1] += line.strip()
-
-        _append_2_line_fasta(two_line_fasta, fasta_list)
-    # fasta_list contains all input file lines, converted to two-line fastas.
     with open(fasta_2line_file, "w", encoding="utf-8") as f_out:
-        f_out.writelines(fasta_list)
-
-    return len(fasta_list) // 2
+        records = 0
+        for seq_record in SeqIO.parse(fasta_file, "fasta"):
+            f_out.write(f">{seq_record.description}\n")
+            f_out.write(f"{seq_record.seq}\n")
+            records += 1
+        return records
 
 
 if __name__ == "__main__":
