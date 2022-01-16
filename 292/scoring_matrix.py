@@ -1,4 +1,6 @@
-from typing import Union, List
+"""Measure similarity of two protein sequences."""
+
+from typing import List, Union
 
 # Grabbed matrix from from
 # https://www.ncbi.nlm.nih.gov/Class/FieldGuide/BLOSUM62.txt
@@ -37,22 +39,22 @@ X  0 -1 -1 -1 -2 -1 -1 -1 -1 -1 -1 -1 -1 -1 -2  0  0 -2 -1 -1 -1 -1 -1 -4
 
 
 def matrix_score(sequence1: str, sequence2: str, matrix_str: str = BLOSUM62) -> int:
-    """
+    """Score sequence similarity using AA-pair matrix.
+
     Receives two proteins sequences and a matrix table
     Returns the score of two proteins according to the supplied matrix table
     """
-
     # TODO: Complete function
-
-    return score
+    return 69
 
 
 def closest_match(
     reference_sequence: str, query_sequences: List[str], matrix_str: str = BLOSUM62
 ) -> Union[str, List, None]:
-    """
+    """Find query sequence most similar to reference sequence.
+
     Receives a reference sequence, a list of query sequences and a matrix table
     Returns the closest matching sequence(s) or None
     """
-
     # TODO: Complete function
+    return query_sequences[0]
