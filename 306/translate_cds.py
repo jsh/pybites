@@ -1,7 +1,8 @@
 """Use translation table to translate coding sequence to protein."""
 
-from Bio.Seq import Seq # type: ignore
-from Bio.Data import CodonTable
+from Bio.Data import CodonTable  # type: ignore
+from Bio.Seq import Seq  # type: ignore
+
 
 def translate_cds(cds: str, translation_table: str) -> str:
     """Translate coding sequence to protein.
