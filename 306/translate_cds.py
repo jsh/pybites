@@ -1,12 +1,7 @@
 """Use translation table to translate coding sequence to protein."""
-# TODO: Add imports
 
 from Bio.Seq import Seq # type: ignore
 from Bio.Data import CodonTable
-
-# Note on Bio.Seq table ids: These can be found in the
-# Seq.CodonTable.ambiguous_generic_by_name variable
-
 
 def translate_cds(cds: str, translation_table: str) -> str:
     """Translate coding sequence to protein.
@@ -16,7 +11,7 @@ def translate_cds(cds: str, translation_table: str) -> str:
         as defined in Bio.Seq.Seq.CodonTable.ambiguous_generic_by_name
     :return: str: Protein sequence
     """
-    table = CodonTable.unambiguous_dna_by_name[translation_table]
+    table = CodonTable.ambiguous_dna_by_name[translation_table]
     cds = "".join(cds.split())  # clean out whitespace
     coding_dna = Seq(cds)
     protein = coding_dna.translate(table, cds=True, to_stop=True)
