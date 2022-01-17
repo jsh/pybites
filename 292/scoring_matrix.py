@@ -41,6 +41,7 @@ X  0 -1 -1 -1 -2 -1 -1 -1 -1 -1 -1 -1 -1 -1 -2  0  0 -2 -1 -1 -1 -1 -1 -4
 class AminoAcidNotFoundError(KeyError):
     """Raise an exception for a bad amino acid."""
 
+
 def matrix_str_to_dict(matrix_str: str) -> Dict[str, Dict[str, int]]:
     """Transform dictionary string to 2-d array of ints."""
     scoring_matrix = {}
