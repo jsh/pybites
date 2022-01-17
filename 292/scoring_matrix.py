@@ -1,6 +1,6 @@
 """Measure similarity of two protein sequences."""
 
-from typing import List, Union
+from typing import Dict, List, Union
 
 # Grabbed matrix from from
 # https://www.ncbi.nlm.nih.gov/Class/FieldGuide/BLOSUM62.txt
@@ -37,6 +37,16 @@ Z -1  0  0  1 -3  3  4 -2  0 -3 -3  1 -1 -3 -1  0 -1 -3 -2 -2  1  4 -1 -4
 X  0 -1 -1 -1 -2 -1 -1 -1 -1 -1 -1 -1 -1 -1 -2  0  0 -2 -1 -1 -1 -1 -1 -4
 * -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4  1 """
 
+def matrix_str_to_dict(matrix_str: str) -> Dict[str, Dict[str, int]] :
+	scoring_matrix = {}
+	table = [line.split() for line in BLOSUM62.split("\n") if line[0] != "#"]
+	aa_tos = table[0]
+	for row in table[1:]:
+		aa_from = row[0]
+		scores = [int(entry) for entry in row[1:]] # convert scores to ints
+		pairs = dict(list(zip(aa_tos, scores))) # dict of pairs, {aa_to: score}
+		scoring_matrix[aa_from] = pairs # 2-D dictionary scoring_matrix[from][to] == score
+	return scoring_matrix
 
 def matrix_score(sequence1: str, sequence2: str, matrix_str: str = BLOSUM62) -> int:
     """Score sequence similarity using AA-pair matrix.
@@ -45,7 +55,12 @@ def matrix_score(sequence1: str, sequence2: str, matrix_str: str = BLOSUM62) -> 
     Returns the score of two proteins according to the supplied matrix table
     """
     # TODO: Complete function
-    return 69
+    assert len(sequence1) == len(sequence2), "Proteins are different lengths"
+    matrix_table = matrix_str_to_dict(matrix_str)
+    score = 0
+    for aa_from, aa_to in zip(sequence1, sequence2):
+        score += matrix_table[aa_from][aa_to]
+    return score
 
 
 def closest_match(
