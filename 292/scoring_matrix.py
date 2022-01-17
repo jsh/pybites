@@ -37,16 +37,24 @@ Z -1  0  0  1 -3  3  4 -2  0 -3 -3  1 -1 -3 -1  0 -1 -3 -2 -2  1  4 -1 -4
 X  0 -1 -1 -1 -2 -1 -1 -1 -1 -1 -1 -1 -1 -1 -2  0  0 -2 -1 -1 -1 -1 -1 -4
 * -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4 -4  1 """
 
-def matrix_str_to_dict(matrix_str: str) -> Dict[str, Dict[str, int]] :
-	scoring_matrix = {}
-	table = [line.split() for line in BLOSUM62.split("\n") if line[0] != "#"]
-	aa_tos = table[0]
-	for row in table[1:]:
-		aa_from = row[0]
-		scores = [int(entry) for entry in row[1:]] # convert scores to ints
-		pairs = dict(list(zip(aa_tos, scores))) # dict of pairs, {aa_to: score}
-		scoring_matrix[aa_from] = pairs # 2-D dictionary scoring_matrix[from][to] == score
-	return scoring_matrix
+
+class AminoAcidNotFoundError(KeyError):
+    """Raise an exception for a bad amino acid."""
+
+def matrix_str_to_dict(matrix_str: str) -> Dict[str, Dict[str, int]]:
+    """Transform dictionary string to 2-d array of ints."""
+    scoring_matrix = {}
+    table = [line.split() for line in matrix_str.split("\n") if line[0] != "#"]
+    aa_tos = table[0]
+    for row in table[1:]:
+        aa_from = row[0]
+        scores = [int(entry) for entry in row[1:]]  # convert scores to ints
+        pairs = dict(list(zip(aa_tos, scores)))  # dict of pairs, {aa_to: score}
+        scoring_matrix[
+            aa_from
+        ] = pairs  # 2-D dictionary scoring_matrix[from][to] == score
+    return scoring_matrix
+
 
 def matrix_score(sequence1: str, sequence2: str, matrix_str: str = BLOSUM62) -> int:
     """Score sequence similarity using AA-pair matrix.
@@ -54,12 +62,19 @@ def matrix_score(sequence1: str, sequence2: str, matrix_str: str = BLOSUM62) -> 
     Receives two proteins sequences and a matrix table
     Returns the score of two proteins according to the supplied matrix table
     """
-    # TODO: Complete function
     assert len(sequence1) == len(sequence2), "Proteins are different lengths"
     matrix_table = matrix_str_to_dict(matrix_str)
+    sequence1 = sequence1.upper()
+    sequence2 = sequence2.upper()
     score = 0
     for aa_from, aa_to in zip(sequence1, sequence2):
-        score += matrix_table[aa_from][aa_to]
+        try:
+            score += matrix_table[aa_from][aa_to]
+        except KeyError:
+            err_msg = (
+                f"Scoring matrix does not support scoring for: ('{aa_from}', '{aa_to}')"
+            )
+            raise AminoAcidNotFoundError(err_msg) from KeyError
     return score
 
 
@@ -71,5 +86,15 @@ def closest_match(
     Receives a reference sequence, a list of query sequences and a matrix table
     Returns the closest matching sequence(s) or None
     """
-    # TODO: Complete function
-    return query_sequences[0]
+    score = {}
+    if not query_sequences:
+        return None
+    for query_sequence in query_sequences:
+        score[query_sequence] = matrix_score(
+            reference_sequence, query_sequence, matrix_str
+        )
+    max_score = max(score.values())
+    closest = [sequence for sequence in query_sequences if score[sequence] == max_score]
+    if len(closest) == 1:
+        return closest[0]
+    return closest
