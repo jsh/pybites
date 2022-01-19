@@ -26,25 +26,29 @@ def convert_to_unique_genes(filename_in, filename_out):
     returns None
     """
     try:
-        with gzip.open(filename_in) as f_in, open(
-            filename_out, "r", encoding="utf-8"
+        with gzip.open(filename_in, "rt") as f_in, open(
+            filename_out, "w", encoding="utf-8"
         ) as f_out:
-            f_in.readlines()
-            f_out.writelines()
+            all = f_in.readlines()
+            f_out.writelines(all)
         os.replace(filename_out, filename_in)
     except gzip.BadGzipFile:
         pass
-    pat = re.compile(r"\S+\s\[locus_tag=(.*)]")
+    pat = re.compile(r"(\S+)\s\[locus_tag=(.*)]")
     record_list = defaultdict(list)
-
+    gene_list = {}
     for record in SeqIO.parse(filename_in, "fasta"):
-        locus_tag = pat.match(record.description)[1]
-        record_list[record.seq].append(locus_tag)
+        gene = pat.match(record.description)[1]
+        locus_tag = pat.match(record.description)[2]
+        seq = str(record.seq).upper()
+        record_list[seq].append(locus_tag)
+        gene_list[seq] = gene
     record_list = sorted(record_list.items(), key=ntags, reverse=True)
     with open(filename_out, "w", encoding="utf-8") as f_out:
         for record in record_list:
             seq, locus_tags = record
             plural = "s" if len(locus_tags) > 1 else ""
             locus_tags = ",".join(locus_tags)
-            f_out.write(f"> narI [locus_tag{plural}={locus_tags}]\n")
+            gene = gene_list[seq]
+            f_out.write(f">{gene} [locus_tag{plural}={locus_tags}]\n")
             f_out.write(f"{seq}\n")
