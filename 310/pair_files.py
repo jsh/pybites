@@ -20,7 +20,7 @@ def _is_valid_name(filename: str) -> bool:
     - The file name extension should end in fastq.gz (no extra extensions such as fastq.gz.md5)
     """
     pat = re.compile(
-        r"\w+_S([1-9]|\d)_L\d\d[1-9]_R(1|2)_\d\d[1-9].fastq.gz", flags=re.IGNORECASE
+        r"\S+_S([1-9]|\d)_L\d\d[1-9]_R(1|2)_\d\d[1-9].fastq.gz", flags=re.IGNORECASE
     )
     return bool(pat.fullmatch(filename))
 
