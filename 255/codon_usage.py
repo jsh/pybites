@@ -1,12 +1,4 @@
-#!/usr/bin/env python3
-"""Print codon usage statistics."""
-
-# TODO: convert T->U
-# TODO: print out a codon at a time
-
 import os
-import re
-from typing import Dict, List, Tuple
 from urllib.request import urlretrieve
 
 # Translation Table:
@@ -28,43 +20,22 @@ URL = "https://bites-data.s3.us-east-2.amazonaws.com/NC_009641.txt"
 BASE_ORDER = ["U", "C", "A", "G"]
 
 
-def _preload_sequences(url: str = URL) -> List[str]:
-    """Return coding sequences, one sequence each line.
-
+def _preload_sequences(url=URL):
+    """
     Provided helper function
+    Returns coding sequences, one sequence each line
     """
     filename = os.path.join(os.getenv("TMP", "/tmp"), "NC_009641.txt")
     if not os.path.isfile(filename):
         urlretrieve(url, filename)
-    with open(filename, "r", encoding="utf-8") as f_seq:
-        return f_seq.readlines()
-
-
-def _translation_table_to_dict(translation_table: str) -> Dict[str, Tuple[str, str]]:
-    """Convert translation table to {codon: (AA, Start)}."""
-    codons = [
-        "".join([f, s, t]) for f in BASE_ORDER for s in BASE_ORDER for t in BASE_ORDER
-    ]
-    pat = re.compile(r"(\S+)\s+=\s+(\S+)")
-    transl_rows = re.findall(pat, translation_table)
-    transl_dict = {entry[0]: entry[1] for entry in transl_rows}
-    assert (
-        len(transl_dict["AAs"])
-        == len(transl_dict["Starts"])
-        == len(transl_dict["Base1"])
-        == len(transl_dict["Base2"])
-        == len(transl_dict["Base3"])
-        == len(codons)
-    )
-    return dict(zip(codons, zip(transl_dict["AAs"], transl_dict["Starts"])))
+    with open(filename, "r") as f:
+        return f.readlines()
 
 
 def return_codon_usage_table(
-    sequences: List[str] = _preload_sequences(),
-    translation_table_str: str = TRANSL_TABLE_11,
-) -> str:
-    """Convert sequence and tranlation table to table of bases and frequencies.
-
+    sequences=_preload_sequences(), translation_table_str=TRANSL_TABLE_11
+):
+    """
     Receives a list of gene sequences and a translation table string
     Returns a string with all bases and their frequencies in a table
     with the following fields:
@@ -73,32 +44,8 @@ def return_codon_usage_table(
     Skip invalid coding sequences:
        --> must consist entirely of codons (3-base triplet)
     """
-    table_dict = _translation_table_to_dict(translation_table_str)
-    sequences = [sequence.strip() for sequence in sequences]
-    assert 1 not in [len(sequence) % 3 for sequence in sequences]
-    codons = {}
-    for sequence in sequences:
-        for pos in range(0, len(sequence), 3):
-            codon = sequence[pos:pos+3]
-            if codon not in codons:
-                codons[codon] = 0
-            codons[codon] += 1
-    total_codons = sum(codons.values())
-    codon_dict = _translation_table_to_dict(TRANSL_TABLE_11)
-    codon_list = list(codon_dict.keys())
+    pass
 
-    divider = "---------------------------------------------------------------------------------------------------------\n"
-    codon_usage_table = "|  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |\n"
-    codon_usage_table += divider
-    for codon in sorted(codons, key=codon_list.index):
-        aa = codon_dict[codon][0]
-        number = codons[codon]
-        freq_per_1000 = round((number/total_codons)*1000, 1)
-        codon_usage_table += f"| {codon}: {aa} {freq_per_1000} {number} "
-        if codon_list.index(codon) % 16 == 15:
-            codon_usage_table += "|\n"
-            codon_usage_table += divider
-    return codon_usage_table
 
 if __name__ == "__main__":
     print(return_codon_usage_table())
