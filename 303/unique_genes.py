@@ -1,7 +1,6 @@
 """Bite 303. Unique genes."""
 
 import gzip
-import os
 import re
 from collections import defaultdict
 
@@ -27,10 +26,10 @@ def convert_to_unique_genes(filename_in, filename_out):
     """
     if filename_in.endswith(".gz"):
         with gzip.open(filename_in, "rt") as f_in:
-            all = f_in.readlines()
+            all_lines = f_in.readlines()
         filename_in = filename_in[:-3]
         with open(filename_in, "w", encoding="utf-8") as f_out:
-            f_out.writelines(all)
+            f_out.writelines(all_lines)
     pat = re.compile(r"(\S+)\s\[locus_tag=(.*)]")
     record_list = defaultdict(list)
     gene_list = {}
@@ -47,7 +46,9 @@ def convert_to_unique_genes(filename_in, filename_out):
     if filename_out.endswith(".gz"):
         f_out = gzip.open(filename_out, "wt")
     else:
-        f_out= open(filename_out, "w", encoding="utf-8")
+        f_out = open(  # pylint: disable=consider-using-with
+            filename_out, "w", encoding="utf-8"
+        )
 
     for record in record_list:
         seq, locus_tags = record
