@@ -9,7 +9,7 @@ def _casefold(string: str) -> str:
     return string.casefold()
 
 
-def _is_valid_name(filename: str) -> bool:
+def _valid_name(filename: str) -> bool:
     """Check for valid filename.
 
     - SampleName can contain letters, number or special characters (including _)
@@ -42,7 +42,7 @@ def pair_files(filenames: List[str]) -> List[Tuple[str, str]]:
     filenames: list[str] containing filenames
     returns: list[tuple[str, str]] containing filename pairs
     """
-    filenames = [filename for filename in filenames if _is_valid_name(filename)]
+    filenames = [filename for filename in filenames if _valid_name(filename)]
     r1s = [
         filename for filename in filenames if "_R1_" in filename or "_r1_" in filename
     ]
