@@ -80,14 +80,14 @@ def _tt_str_to_aa_dict(translation_table_str: str) -> Tuple[Dict[str, str], Set[
     return aa_dict, start_codons
 
 
-def _codon_table_to_str(
+def _codon_table_to_str(  # pylint: disable=too-many-locals
     codon_table: Counter, translation_table_str: str
-) -> str:  # pylint: disable=too-many-locals
+) -> str:
     header = "|  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |"
     separator = "-" * len(header)
     totals = sum(codon_table.values())
     freq_table = [header, separator]
-    aa_dict, start_codons = _tt_str_to_aa_dict(translation_table_str)
+    aa_dict, _ = _tt_str_to_aa_dict(translation_table_str)
     for b_1 in BASE_ORDER:
         for b_3 in BASE_ORDER:
             line = [""]
