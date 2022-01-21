@@ -61,49 +61,53 @@ def _table(sequence: str):
 
 
 def _tt_str_to_aa_dict(translation_table_str: str) -> Tuple[Dict[str, str], Set[str]]:
-	rows = translation_table_str.split("\n")
-	rows = [row.split() for row in rows]
-	table_dict = {row[0]:row[2].upper() for row in rows if len(row) == 3}
-	aas = table_dict['AAs']
-	starts = table_dict['Starts']
-	base1 = table_dict['Base1'].replace('T', 'U')
-	base2 = table_dict['Base2'].replace('T', 'U')
-	base3 = table_dict['Base3'].replace('T', 'U')
-	assert len(aas) == len(starts) == len(base1) == len(base2) == len(base3)
-	aa_dict = {}
-	start_codons = set()
-	for col in range(len(aas)):
-		codon = base1[col] + base2[col] + base3[col]
-		aa_dict[codon] = aas[col]
-		if starts[col] == 'M':
-			start_codons.update(codon)
-	return aa_dict, start_codons 
+    tt_rows = translation_table_str.split("\n")
+    rows = [row.split() for row in tt_rows]
+    table_dict = {row[0]: row[2].upper() for row in rows if len(row) == 3}
+    aas = table_dict["AAs"]
+    starts = table_dict["Starts"]
+    base1 = table_dict["Base1"].replace("T", "U")
+    base2 = table_dict["Base2"].replace("T", "U")
+    base3 = table_dict["Base3"].replace("T", "U")
+    assert len(aas) == len(starts) == len(base1) == len(base2) == len(base3)
+    aa_dict = {}
+    start_codons: Set[str] = set()
+    for col, amino_acid in enumerate(aas):
+        codon = base1[col] + base2[col] + base3[col]
+        aa_dict[codon] = amino_acid
+        if starts[col] == "M":
+            start_codons.update(codon)
+    return aa_dict, start_codons
 
 
-def _codon_table_to_str(codon_table: Counter, translation_table_str: str) -> str:
+def _codon_table_to_str(
+    codon_table: Counter, translation_table_str: str
+) -> str:  # pylint: disable=too-many-locals
     header = "|  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |  Codon AA  Freq  Count  |"
-    separator = "-"*len(header)
+    separator = "-" * len(header)
     totals = sum(codon_table.values())
     freq_table = [header, separator]
     aa_dict, start_codons = _tt_str_to_aa_dict(translation_table_str)
-    for b1 in BASE_ORDER:
-        for b3 in BASE_ORDER:
+    for b_1 in BASE_ORDER:
+        for b_3 in BASE_ORDER:
             line = [""]
-            for b2 in BASE_ORDER:
-                codon = b1 + b2 + b3
+            for b_2 in BASE_ORDER:
+                codon = b_1 + b_2 + b_3
                 count = codon_table[codon]
-                line.append(f"{codon:<3}:  {aa_dict[codon]:<3}{round(count*1000/totals,1):>5} {count:>6}  ")
-            line = "|  ".join(line) + "|"
-            freq_table.append(line)
+                line.append(
+                    f"{codon:<3}:  {aa_dict[codon]:<3}{round(count*1000/totals,1):>5} {count:>6}  "
+                )
+            nline = "|  ".join(line) + "|"
+            freq_table.append(nline)
         freq_table.append(separator)
     freq_table_string = "\n".join(freq_table)
-    return(freq_table_string)
+    return freq_table_string
 
 
 def return_codon_usage_table(
     sequences: List[str] = _preload_sequences(),
     translation_table_str: str = TRANSL_TABLE_11,
-) -> Dict:
+) -> str:
     """Find frequency of each codon.
 
     Receives a list of gene sequences and a translation table string
@@ -119,7 +123,7 @@ def return_codon_usage_table(
     sequences = _clean_sequences(sequences)
     for sequence in sequences:
         codon_table += _table(sequence)
-    return(_codon_table_to_str(codon_table, translation_table_str))
+    return _codon_table_to_str(codon_table, translation_table_str)
 
 
 if __name__ == "__main__":
