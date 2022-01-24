@@ -1,7 +1,21 @@
+"""Unit-test workouts.py."""
+
 import pytest
 
-from workouts import print_workout_days
+from workouts import print_workout_days, WORKOUTS
 
 
-def test_print_workout_days():
-    pass
+@pytest.mark.parametrize (
+	"selector, expected_output",
+	[
+	("foo", "No matching workout\n"),
+	("#2", "Thu, Fri\n"),
+	("lower", "Tue, Fri\n"),
+	("card", "Wed\n")
+	]
+)
+def test_print_workout_days(selector: str, expected_output: str, capsys) -> None:
+	"""Unit-test print_workout_days."""
+	print_workout_days(selector, WORKOUTS)
+	captured = capsys.readouterr()
+	assert captured.out == expected_output
