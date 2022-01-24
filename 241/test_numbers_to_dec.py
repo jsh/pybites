@@ -23,7 +23,8 @@ def test_good_input(numlist: List[int], expected_output: int) -> None:
     "numlist, exception",
     [
         ([6, 4, 2, True], TypeError),
-        ([-3, 12], ValueError),
+        ([-3, 6], ValueError),
+        ([0, 10], ValueError),
         ([3.6, 4, 1], TypeError),
         (["4", 5, 3, 1], TypeError),
     ],
