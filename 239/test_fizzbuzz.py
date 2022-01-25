@@ -6,21 +6,19 @@ import pytest
 
 from fizzbuzz import fizzbuzz
 
-# write one or more pytest functions below, they need to start with test_
-
 
 @pytest.mark.parametrize(
     "integer, expected_output",
     [
-        (3, "Fizz", "divisible by three"),
-        (5, "Buzz", "divisible by five"),
-        (15, "Fizz Buzz", "divisible by both"),
-        (7, 7, "divisible by neither"),
-        (0, "Fizz Buzz", "zero"),
-        (-5, "Buzz", "negative number"),
+        pytest.param(3, "Fizz", id="divisible by three"),
+        pytest.param(5, "Buzz", id="divisible by five"),
+        pytest.param(15, "Fizz Buzz", id="divisible by both"),
+        pytest.param(7, 7, id="divisible by neither"),
+        pytest.param(0, "Fizz Buzz", id="zero"),
+        pytest.param(-5, "Buzz", id="negative number"),
     ],
 )
-def test_fizzbuzz(integer: int, expected_output: str) -> None:
+def test_fizzbuzz(integer: int, expected_output: Any) -> None:
     """Unit-test fizzbuzz."""
     assert fizzbuzz(integer) == expected_output
 
