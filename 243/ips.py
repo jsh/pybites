@@ -1,3 +1,5 @@
+"""Bite 243. Test code that parses JSON and IP ranges."""
+
 import json
 from contextlib import suppress
 from dataclasses import dataclass
@@ -8,7 +10,8 @@ from typing import List
 
 @dataclass(frozen=True)
 class ServiceIPRange:
-    """
+    """AWS IPv4 public network range.
+
     Represents an IPv4 public network range, allocated by AWS for use with
     a specific service and region.
     """
@@ -18,12 +21,16 @@ class ServiceIPRange:
     cidr: IPv4Network
 
     def __str__(self):
-        return (f"{self.cidr} is allocated to the {self.service} "
-                f"service in the {self.region} region")
+        """String representation of range."""
+        return (
+            f"{self.cidr} is allocated to the {self.service} "
+            f"service in the {self.region} region"
+        )
 
 
 def parse_ipv4_service_ranges(source: Path) -> List[ServiceIPRange]:
-    """
+    """List all IPv4 network ranges.
+
     Given a JSON file containing AWS public IP addresses, return a list of
     ServiceIPRange objects representing all IPv4 network ranges. See also:
 
@@ -43,9 +50,9 @@ def parse_ipv4_service_ranges(source: Path) -> List[ServiceIPRange]:
     return ipv4_service_ranges
 
 
-def get_aws_service_range(address: str,
-                          service_ranges: list) -> List[ServiceIPRange]:
-    """
+def get_aws_service_range(address: str, service_ranges: list) -> List[ServiceIPRange]:
+    """List IP ranges that contain address.
+
     Return a list of ServiceIPRange objects representing all AWS public
     IP ranges that contain `address`. Raise a ValueError if `address`
     is not a valid IPv4 address.
@@ -55,5 +62,4 @@ def get_aws_service_range(address: str,
     except AddressValueError:
         raise ValueError("Address must be a valid IPv4 address")
 
-    return [range_ for range_ in service_ranges
-            if ipv4_address in range_.cidr]
+    return [range_ for range_ in service_ranges if ipv4_address in range_.cidr]
