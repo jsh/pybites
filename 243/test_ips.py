@@ -104,8 +104,9 @@ def test_get_aws_service_range(input_ip, expected_output, service_ranges) -> Non
 
 def test_bad_ip(service_ranges) -> None:
     """Unit-test bad IP value throws correct exception."""
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as excinfo:
         get_aws_service_range("foo", service_ranges)
+    assert "Address must be a valid IPv4 address" in str(excinfo.value)
 
 
 def test_nonexistent_ip(service_ranges) -> None:
