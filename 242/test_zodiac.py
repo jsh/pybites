@@ -33,6 +33,20 @@ def signs() -> List[Sign]:
     return get_signs(data)
 
 
-def test_dummy() -> None:
-    """A non-test."""
-    pass
+def test_fixture(signs) -> None:
+    """Trying out the fixture."""
+    print(signs[0])
+
+
+def test_get_sign_with_most_famous_people(signs) -> None:
+    assert get_sign_with_most_famous_people(signs) == ("Scorpio", 35)
+
+
+def test_signs_are_mutually_compatible(signs) -> None:
+    assert signs_are_mutually_compatible(signs, "Aries", "Leo")
+    assert not signs_are_mutually_compatible(signs, "Scorpio", "Saggitarius")
+
+
+def test_get_sign_by_date(signs) -> None:
+    first_day = datetime.fromordinal(1)
+    assert get_sign_by_date(signs, first_day) == "Capricorn"

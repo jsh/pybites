@@ -57,4 +57,3 @@ def get_sign_by_date(signs: list, date: datetime) -> str:
             and day <= int(end_day)
         ):
             return sign.name
-    return ""
