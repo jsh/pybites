@@ -21,6 +21,7 @@ from zodiac import (
 URL = "https://bites-data.s3.us-east-2.amazonaws.com/zodiac.json"
 TMP = os.getenv("TMP", "/tmp")
 PATH = Path(TMP, "zodiac.json")
+# Aries ['March 21', 'April 19']
 
 
 @pytest.fixture(scope="module")
@@ -38,6 +39,13 @@ def test_fixture(signs) -> None:
     print(signs[0])
 
 
+def test_Sign(signs) -> None:
+    assert (
+        repr(Sign(1, 2, 3, 4))
+        == "Sign(name=1, compatibility=2, famous_people=3, sun_dates=4)"
+    )
+
+
 def test_get_sign_with_most_famous_people(signs) -> None:
     assert get_sign_with_most_famous_people(signs) == ("Scorpio", 35)
 
@@ -48,5 +56,13 @@ def test_signs_are_mutually_compatible(signs) -> None:
 
 
 def test_get_sign_by_date(signs) -> None:
-    first_day = datetime.fromordinal(1)
-    assert get_sign_by_date(signs, first_day) == "Capricorn"
+    day_before = datetime.fromisoformat("2022-03-20")
+    assert get_sign_by_date(signs, day_before) != "Aries"
+    first_day = datetime.fromisoformat("2022-03-21")
+    assert get_sign_by_date(signs, first_day) == "Aries"
+    middle_day = datetime.fromisoformat("2022-04-05")
+    assert get_sign_by_date(signs, middle_day) == "Aries"
+    last_day = datetime.fromisoformat("2022-04-19")
+    assert get_sign_by_date(signs, last_day) == "Aries"
+    day_after = datetime.fromisoformat("2022-04-20")
+    assert get_sign_by_date(signs, day_after) != "Aries"
