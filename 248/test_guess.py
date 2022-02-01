@@ -87,11 +87,11 @@ def test_call_bad_input(mock_input, capsys) -> None:
     out, err = capsys.readouterr()
     assert "Enter a number, try again" in out
 
-# @patch("guess.input", side_effect=[5, 6])
-# def test_call(mock_input, capsys) -> None:
-#     """Unit-test __call__()."""
-#     game = GuessGame(5)
-#     game()
-#     out, err = capsys.readouterr()
-#     assert "You guessed it" in out
-#     assert "Too high" not in out
+@patch("guess.input", side_effect=[5, 6])
+def test_call_stops(mock_input, capsys) -> None:
+    """Unit-test __call__()."""
+    game = GuessGame(5)
+    game()
+    out, err = capsys.readouterr()
+    assert "You guessed it" in out
+    assert "Too high" not in out
