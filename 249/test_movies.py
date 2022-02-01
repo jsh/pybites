@@ -1,3 +1,5 @@
+"""Bite 249. Test a movie DB class."""
+
 import os
 import random
 import string
@@ -6,10 +8,8 @@ import pytest
 
 from movies import MovieDb
 
-salt = ''.join(
-    random.choice(string.ascii_lowercase) for i in range(20)
-)
-DB = os.path.join(os.getenv("TMP", "/tmp"), f'movies_{salt}.db')
+salt = "".join(random.choice(string.ascii_lowercase) for i in range(20))
+DB = os.path.join(os.getenv("TMP", "/tmp"), f"movies_{salt}.db")
 # https://www.imdb.com/list/ls055592025/
 DATA = [
     ("The Godfather", 1972, 9.2),
@@ -23,14 +23,28 @@ DATA = [
     ("One Flew Over the Cuckoo's Nest", 1975, 8.7),
     ("Lawrence of Arabia", 1962, 8.3),
 ]
-TABLE = 'movies'
+TABLE = "movies"
 
 
 @pytest.fixture
 def db():
+    """Fixture to instantiate movie class."""
     # instantiate MovieDb class using above constants
     # do proper setup / teardown using MovieDb methods
     # https://docs.pytest.org/en/latest/fixture.html (hint: yield)
+    # TODO: setup with __init__()
+    # TODO: tear-down with drop_table
+    pass
 
 
-# write tests for all MovieDb's query / add / delete
+def test_query(db):
+    """Unit-test query."""
+    # TODO: lots of args, test them all
+
+
+def test_add(db):
+    """Unit-test add."""
+
+
+def test_delete(db):
+    """Unit-test delete."""
