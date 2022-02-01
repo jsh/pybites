@@ -1,4 +1,5 @@
 """Bite 248. Test a number guessing game."""
+import sys
 from unittest.mock import patch
 
 import pytest
@@ -7,8 +8,16 @@ from guess import MAX_NUMBER, GuessGame, InvalidNumber
 
 # write test code to reach 100% coverage and a 100% mutpy score
 
+
 def my_input():
-	return 2
+    """Mock input, return 5."""
+    return 5
+
+
+def my_bad_input():
+    """Mock bad input."""
+    return "FOO"
+
 
 def test_init() -> None:
     """Unit-test __init__()."""
@@ -28,14 +37,41 @@ def test_init() -> None:
 )
 def test_validate(secret_number, err_msg) -> None:
     """Unit-test _validate()."""
-    with pytest.raises(InvalidNumber, match=err_msg) as exc:
-        game = GuessGame(secret_number)
+    with pytest.raises(InvalidNumber, match=err_msg):
+        GuessGame(secret_number)
 
-#@patch("guess.input", side_effect=[1, 3, 2])
+
+@pytest.mark.parametrize(
+    "secret_number, expected_output",
+    [
+        (10, "Too low"),
+        (1, "Too high"),
+        (5, "You guessed it"),
+    ],
+)
 @patch("guess.input", my_input)
-#@patch("guess.input", side_effect=[1, 3, 2])
-def test_call(capsys) -> None:
+def test_my_call(secret_number, expected_output, capsys) -> None:
     """Unit-test __call__()."""
-    game = GuessGame(2)
+    game = GuessGame(secret_number, max_guesses=1)
     game()
-    captured = capsys.readouterr()
+    out, err = capsys.readouterr()
+    assert expected_output in out
+
+
+@patch("guess.input", my_input)
+def test_call_too_many_guesses(capsys) -> None:
+    """Test __call__() with too many guesses."""
+    game = GuessGame(1, max_guesses=0)
+    game()
+    out, err = capsys.readouterr()
+    assert out.strip() == "Sorry, the number was 1"
+
+
+@patch("guess.input", side_effect=["foo"])
+def test_call_bad_input(mock_input, capsys) -> None:
+    """Test __call__() bad input."""
+    game = GuessGame(4)
+    with pytest.raises(StopIteration):
+        game()
+    out, err = capsys.readouterr()
+    assert "Enter a number, try again" in out
