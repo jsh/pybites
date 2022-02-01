@@ -60,13 +60,22 @@ def test_call(secret_number, expected_output, capsys) -> None:
     assert expected_output in out
 
 
-@patch("guess.input", return_value=1)
+@patch("guess.input", side_effect=[2, 1])
 def test_call_too_many_guesses(mock_input, capsys) -> None:
     """Test __call__() with too many guesses."""
-    game = GuessGame(1, max_guesses=0)
+    game = GuessGame(1, max_guesses=1)
     game()
     out, err = capsys.readouterr()
-    assert out.strip() == "Sorry, the number was 1"
+    assert "Sorry, the number was 1" in out
+
+
+@patch("guess.input", side_effect=[2, 1])
+def test_call_not_too_many_guesses(mock_input, capsys) -> None:
+    """Test __call__() with too many guesses."""
+    game = GuessGame(1, max_guesses=2)
+    game()
+    out, err = capsys.readouterr()
+    assert "You guessed it" in out
 
 
 @patch("guess.input", side_effect=["foo"])
@@ -77,3 +86,12 @@ def test_call_bad_input(mock_input, capsys) -> None:
         game()
     out, err = capsys.readouterr()
     assert "Enter a number, try again" in out
+
+# @patch("guess.input", side_effect=[5, 6])
+# def test_call(mock_input, capsys) -> None:
+#     """Unit-test __call__()."""
+#     game = GuessGame(5)
+#     game()
+#     out, err = capsys.readouterr()
+#     assert "You guessed it" in out
+#     assert "Too high" not in out
