@@ -44,13 +44,15 @@ def test_validate(secret_number, err_msg) -> None:
 @pytest.mark.parametrize(
     "secret_number, expected_output",
     [
+        (10, "Guess a number"),
         (10, "Too low"),
-        (1, "Too high"),
+        (0, "Too high"),
+        (MAX_NUMBER, "Too low"),
         (5, "You guessed it"),
     ],
 )
 @patch("guess.input", my_input)
-def test_my_call(secret_number, expected_output, capsys) -> None:
+def test_call(secret_number, expected_output, capsys) -> None:
     """Unit-test __call__()."""
     game = GuessGame(secret_number, max_guesses=1)
     game()
@@ -58,8 +60,8 @@ def test_my_call(secret_number, expected_output, capsys) -> None:
     assert expected_output in out
 
 
-@patch("guess.input", my_input)
-def test_call_too_many_guesses(capsys) -> None:
+@patch("guess.input", return_value=1)
+def test_call_too_many_guesses(mock_input, capsys) -> None:
     """Test __call__() with too many guesses."""
     game = GuessGame(1, max_guesses=0)
     game()
