@@ -2,6 +2,7 @@
 
 import os
 import random
+import sqlite3
 import string
 
 import pytest
@@ -44,9 +45,20 @@ def db(request):
     request.add_finalizer(fin)
 
 
+def test_init(db):
+    assert isinstance(db, MovieDb)
+    assert db.table == "movies"
+    assert isinstance(db.cur, sqlite3.Cursor)
+    assert db.data == DATA
+    assert isinstance(db.con, sqlite3.Connection)
+
+
 def test_query(db):
     """Unit-test query."""
     # TODO: lots of args, test them all
+    datum = DATA[0]
+    reply = db.query(*datum)
+    assert reply == Null
 
 
 def test_add(db):
