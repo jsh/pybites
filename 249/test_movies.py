@@ -27,14 +27,21 @@ TABLE = "movies"
 
 
 @pytest.fixture
-def db():
+def db(request):
     """Fixture to instantiate movie class."""
     # instantiate MovieDb class using above constants
     # do proper setup / teardown using MovieDb methods
     # https://docs.pytest.org/en/latest/fixture.html (hint: yield)
     # TODO: setup with __init__()
     # TODO: tear-down with drop_table
-    pass
+
+    database = MovieDb(DB, DATA, TABLE)
+    return database
+
+    def fin():
+        database.drop_table()
+
+    request.add_finalizer(fin)
 
 
 def test_query(db):
