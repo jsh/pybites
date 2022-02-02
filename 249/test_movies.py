@@ -29,15 +29,8 @@ TABLE = "movies"
 
 
 @pytest.fixture
-def db():
+def db(request):
     """Fixture to instantiate movie class."""
-    # TODO: restore db(request)
-    # instantiate MovieDb class using above constants
-    # do proper setup / teardown using MovieDb methods
-    # https://docs.pytest.org/en/latest/fixture.html (hint: yield)
-    # TODO: setup with __init__()
-    # TODO: tear-down with drop_table
-
     database = MovieDb(DB, DATA, TABLE)
     database.init()
     yield database
@@ -45,6 +38,7 @@ def db():
 
 
 def test_init(db):
+    """Db is initialized."""
     assert isinstance(db, MovieDb)
     assert db.table == TABLE
     assert isinstance(db.cur, sqlite3.Cursor)
@@ -53,28 +47,26 @@ def test_init(db):
 
 
 def test_query(db):
-    """Unit-test query."""
-    # TODO: lots of args, test them all
+    """Query returns correct results."""
     datum = DATA[0]
     reply = db.query(*datum)
     assert reply == [(1,) + datum]
     assert len(db.query(year=1939)) == 2
     assert len(db.query(score_gt=8.3)) == 5
     assert len(db.query(title="Montenegro")) == 0
+    assert len(db.query(title="The")) == 5
 
 
 def test_add(db):
-    """Unit-test add."""
+    """Add adds a retrievable record."""
     crumb = ("Crumb", 1994, 9.5)
     db.add("Crumb", 1994, 9.5)
     assert db.query(title="Crumb")[0][1:] == crumb
 
 
 def test_delete(db):
-    """Unit-test delete."""
+    """Delete deletes a record."""
     crumb = ("Crumb", 1994, 9.5)
-    db.add("Crumb", 1994, 9.5)
-    idx= db.query(title="Crumb")[0][0]
+    db.add(*crumb)
+    idx = db.query(title="Crumb")[0][0]
     db.delete(idx)
-    assert db.query(title="Crumb") == []
-	
