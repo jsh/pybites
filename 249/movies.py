@@ -2,7 +2,6 @@ import sqlite3
 
 
 class MovieDb:
-
     def __init__(self, db, data, table):
         self.con = sqlite3.connect(db)
         self.data = data
@@ -15,18 +14,20 @@ class MovieDb:
 
     def _create_table(self):
         self.cur.execute(
-            (f"CREATE TABLE IF NOT EXISTS {self.table}"
-             "(id INTEGER PRIMARY KEY AUTOINCREMENT,"
-             "title TEXT NOT NULL,"
-             "year INTEGER NOT NULL,"
-             "score REAL NOT NULL)")
+            (
+                f"CREATE TABLE IF NOT EXISTS {self.table}"
+                "(id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                "title TEXT NOT NULL,"
+                "year INTEGER NOT NULL,"
+                "score REAL NOT NULL)"
+            )
         )
 
     def _insert_sample_data(self):
         self.con.executemany(
-            (f"INSERT INTO {self.table} (title, year, score)"
-             "VALUES (?, ?, ?)"),
-            self.data)
+            (f"INSERT INTO {self.table} (title, year, score)" "VALUES (?, ?, ?)"),
+            self.data,
+        )
         self.con.commit()
 
     def drop_table(self):
@@ -50,13 +51,10 @@ class MovieDb:
 
     def add(self, title, year, score):
         self.cur.execute(
-            (f"INSERT INTO {self.table} (title, year, score)"
-             " VALUES (?, ?, ?)"),
-            (title, year, score)
+            (f"INSERT INTO {self.table} (title, year, score)" " VALUES (?, ?, ?)"),
+            (title, year, score),
         )
         return self.cur.lastrowid
 
     def delete(self, idx):
-        self.cur.execute(
-            f"DELETE FROM {self.table} WHERE id=?", (idx,)
-        )
+        self.cur.execute(f"DELETE FROM {self.table} WHERE id=?", (idx,))
