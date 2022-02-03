@@ -4,6 +4,8 @@ from collections import Counter
 
 import requests
 
+from typing import Set
+
 CAR_DATA = "https://bites-data.s3.us-east-2.amazonaws.com/cars.json"
 
 # pre-work: load JSON data into program
@@ -13,7 +15,7 @@ with requests.Session() as session:
 
 
 # TODO: write the code
-def most_prolific_automaker(year):
+def most_prolific_automaker(year: int) -> str:
     """Find most prolific automaker of the year.
 
     Given year 'year' return the automaker that released
@@ -21,7 +23,7 @@ def most_prolific_automaker(year):
     """
 
 
-def get_models(automaker, year):
+def get_models(automaker: str, year: none) -> Set[str]:
     """Get models for automakker and year.
 
     Filter cars 'data' by 'automaker' and 'year',
