@@ -1,42 +1,37 @@
-#!/usr/bin/env python3
 """Bite 27. Parse omdb movie json data."""
 
 import json
-import os
-from pathlib import Path
+from operator import itemgetter
 from typing import Dict, List
-from urllib.request import urlretrieve
 
 
-def retrieve_json():
-    """Retrieve the json to see what it looks like."""
-    tmp = Path(os.getenv("TMP", "/tmp"))
-    s3 = "https://bites-data.s3.us-east-2.amazonaws.com/"
-    data = "omdb_data"
-
-    data_local = tmp / data
-    if not Path(data_local).exists():
-        urlretrieve(s3 + data, data_local)
-
-
-def get_movie_data(files: list) -> List[Dict]:
+def get_movie_data(files: List[str]) -> List[Dict]:
     """Parse movie json files into a list of dicts."""
-    return []
+    movie_data = []
+    for file in files:
+        with open(file, encoding="utf-8") as f_in:
+            movie_data.append(json.load(f_in))
+    return movie_data
 
 
-def get_single_comedy(movies: list) -> str:
+def get_single_comedy(movies: List[Dict]) -> str:
     """Return the movie with Comedy in Genres."""
-    return ""
+    comedies = [movie["Title"] for movie in movies if "Comedy" in movie["Genre"]]
+    return comedies.pop() if comedies else ""
 
 
-def get_movie_most_nominations(movies: list) -> str:
+def get_movie_most_nominations(movies: List[Dict]) -> str:
     """Return the movie that had the most nominations."""
-    return ""
+    for movie in movies:
+        movie["Nominations"] = int(movie["Awards"].split()[-2])
+    by_nominations = sorted(movies, key=itemgetter("Nominations"), reverse=True)
+
+    return by_nominations[0]["Title"]
 
 
-def get_movie_longest_runtime(movies: list) -> str:
+def get_movie_longest_runtime(movies: List[Dict]) -> str:
     """Return the movie that has the longest runtime."""
-    return ""
-
-if __name__ == "__main__":
-    print("hello")
+    for movie in movies:
+        movie["Runtime"] = int(movie["Runtime"].split()[0])
+    by_runtime = sorted(movies, key=itemgetter("Runtime"), reverse=True)
+    return by_runtime[0]["Title"]
