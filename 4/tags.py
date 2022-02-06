@@ -21,11 +21,10 @@ with open(tempfile, encoding="utf-8") as f_in:
 def tags(parent: ET.Element) -> List[Optional[str]]:
     """Extract tags in parent into a list."""
     tag_list = []
-    if not parent:
-        return []
+    if parent.tag == "category":
+        tag_list.append(parent.text)  # you've hit a leaf
+        return tag_list
     for child in parent:
-        if child.tag == "category":
-            tag_list.append(child.text)
         tag_list = tag_list + tags(child)
     return tag_list
 
