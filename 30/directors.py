@@ -33,14 +33,15 @@ def get_movies_by_director() -> Dict[str, List[Movie]]:
         reader = csv.DictReader(csvfile)
         for row in reader:
             name = row["director_name"]
-            try:
-                movie = Movie(
-                    row["movie_title"], int(row["title_year"]), float(row["imdb_score"])
-                )
-                if movie.year >= MIN_YEAR:
-                    directors[name].append(movie)
-            except ValueError:
-                pass
+            title = row["movie_title"]
+            year = row["title_year"]
+            score = row["imdb_score"]
+            if not (name and title and year and score):
+                continue
+            movie = Movie(title, int(year), float(score))
+            if movie.year < MIN_YEAR:
+                continue
+            directors[name].append(movie)
     return directors
 
 
