@@ -5,6 +5,7 @@ import os
 from collections import defaultdict, namedtuple
 from typing import Dict, List, Tuple
 from urllib.request import urlretrieve
+import sys
 
 BASE_URL = "https://bites-data.s3.us-east-2.amazonaws.com/"
 TMP = os.getenv("TMP", "/tmp")
@@ -28,7 +29,20 @@ def get_movies_by_director() -> Dict[str, Movie]:
     where keys are directors, and values are a list of movies,
     use the defined Movie namedtuple
     """
-    return {}
+    import csv
+    movies = defaultdict(list)
+    with open(LOCAL, newline='', encoding="utf-8") as csvfile:
+        reader = csv.DictReader(csvfile, quotechar='|')
+        for row in reader:
+            director = row["director_name"]
+            movie = Movie(row["movie_title"], row["title_year"], row["imdb_score"])
+            movies[director].append(movie)
+    print(movies)
+    sys.exit(0)
+    movies_by_director = {}
+    for director, movie_list in movies:
+       movies_by_director[director] = movie_list
+    return movies_by_director
 
 
 def calc_mean_score(movies: List[Movie]) -> float:
