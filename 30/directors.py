@@ -37,12 +37,7 @@ def get_movies_by_director() -> Dict[str, Movie]:
             director = row["director_name"]
             movie = Movie(row["movie_title"], row["title_year"], row["imdb_score"])
             movies[director].append(movie)
-    print(movies)
-    sys.exit(0)
-    movies_by_director = {}
-    for director, movie_list in movies:
-       movies_by_director[director] = movie_list
-    return movies_by_director
+    return movies
 
 
 def calc_mean_score(movies: List[Movie]) -> float:
