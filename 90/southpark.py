@@ -1,4 +1,5 @@
 """Bite 90. What South Park characters talk most?"""
+# pylint: disable=line-too-long
 
 import csv
 from collections import Counter, defaultdict
@@ -27,7 +28,20 @@ def get_num_words_spoken_by_character_per_episode(content: str) -> Dict[str, Cou
     keys=characters and values=Counter object,
     which is a mapping of episode=>words spoken
     """
-    words_per_episode: Counter = Counter()
-    words_per_episode["1"] = 6
-    words_per_episode["5"] = 9
-    return {"Cartman": words_per_episode}
+    csv_lines = content.splitlines()
+    csv_reader = csv.DictReader(csv_lines)
+    words = defaultdict(list)
+    for row in csv_reader:
+        character = row["Character"]
+        episode = row["Episode"]
+        nwords = len(row["Line"].split())
+        words[character].append((episode, nwords))
+
+    words_per_character_by_episode = {}
+    for character in words:
+        words_per_episode: defaultdict = defaultdict(int)
+        for episode, nwords in words[character]:
+            words_per_episode[episode] += nwords
+        words_per_character_by_episode[character] = Counter(words_per_episode)
+
+    return words_per_character_by_episode
