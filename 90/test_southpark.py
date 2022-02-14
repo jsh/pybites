@@ -17,11 +17,6 @@ def words_spoken_s5():
     return get_num_words_spoken_by_character_per_episode(content)
 
 
-def test_all_words_spoken_season1_stan(words_spoken_s1):
-    expected = [('4', 615), ('6', 572), ('5', 514)]
-    assert words_spoken_s1['Stan'] == expected
-
-
 def test_get_words_spoken_season1_stan(words_spoken_s1):
     expected = [('4', 615), ('6', 572), ('5', 514)]
     assert words_spoken_s1['Stan'].most_common()[:3] == expected

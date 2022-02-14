@@ -23,7 +23,7 @@ def get_season_csv_file(season: int) -> str:
 
 def get_num_words_spoken_by_character_per_episode(
     content: str,
-) -> Dict[str, Counter[str]]:
+) -> Dict[str, Counter]:
     """Count words spoken by character per episode.
 
     Receives loaded csv content (str) and returns a dict of
