@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
 """Bite 129. Analyze Stock Data."""
 
-from typing import Tuple
+from collections import defaultdict
+from typing import Dict, Tuple
 
 import requests
 
@@ -32,6 +32,11 @@ def _cap_str_to_mln_float(cap: str) -> float:
         return 1000 * float(cap[:-1])
 
 
+def _datum_to_cap(datum: Dict) -> float:
+    """Cap value of a datum."""
+    return _cap_str_to_mln_float(datum["cap"])
+
+
 def get_industry_cap(industry: str) -> float:
     """Total cap values for an industry.
 
@@ -39,6 +44,10 @@ def get_industry_cap(industry: str) -> float:
     the _cap_str_to_mln_float to parse the cap values,
     return a float with 2 digit precision
     """
+    industry_data = [datum for datum in data if industry == datum["industry"]]
+    caps = [datum["cap"] for datum in industry_data]
+    caps = [_cap_str_to_mln_float(cap) for cap in caps]
+    return round(sum(caps), 2)
 
 
 def get_stock_symbol_with_highest_cap() -> str:
@@ -47,6 +56,8 @@ def get_stock_symbol_with_highest_cap() -> str:
     Return the stock symbol (e.g. PACD) with the highest cap.
     Use the _cap_str_to_mln_float to parse the cap values
     """
+    highest = max(data, key=_datum_to_cap)
+    return highest["symbol"]
 
 
 def get_sectors_with_max_and_min_stocks() -> Tuple[str, str]:
@@ -54,7 +65,11 @@ def get_sectors_with_max_and_min_stocks() -> Tuple[str, str]:
 
     Return a tuple of the sectors with most and least stocks, discard n/a
     """
-
-
-if __name__ == "__main__":
-    print(data[0])
+    good_data = [datum for datum in data if datum["sector"] != "n/a"]
+    nstocks: defaultdict = defaultdict(int)
+    for datum in good_data:
+        sector = datum["sector"]
+        nstocks[sector] += 1
+    most = max(nstocks, key=nstocks.get)
+    least = min(nstocks, key=nstocks.get)
+    return (most, least)
