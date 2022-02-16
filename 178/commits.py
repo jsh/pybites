@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
 """Bite 178. Parse PyBites blog git commit log."""
 
 import os
+import re
 from collections import Counter
 from typing import Tuple
 from urllib.request import urlretrieve
@@ -12,6 +14,19 @@ urlretrieve("https://bites-data.s3.us-east-2.amazonaws.com/git_log_stat.out", co
 
 # you can use this constant as key to the yyyymm:count dict
 YEAR_MONTH = "{y}-{m:02d}"
+
+
+def tot_changes(changes: str) -> int:
+    """Add deletions and insertions."""
+
+    insertions_pat = re.compile(r"(\d+) insertion")
+    deletions_pat = re.compile(r"(\d+) deletion")
+
+    insertions = insertions_pat.search(changes)
+    insertions = int(insertions.group(1)) if insertions else 0
+    deletions = deletions_pat.search(changes)
+    deletions = int(deletions.group(1)) if deletions else 0
+    return insertions + deletions
 
 
 def get_min_max_amount_of_commits(
@@ -27,3 +42,17 @@ def get_min_max_amount_of_commits(
 
     Returns a tuple of (least_active_month, most_active_month)
     """
+    log_pat = re.compile(r"\S+:\s+(.*)\s+\|\s+.*changed, (.*)$")
+    # 31 insertions(+), 2 deletions(-)
+    with open(commit_log, encoding="utf-8") as f_in:
+        for line in f_in:
+            match = log_pat.match(line)
+            date, changes = match.group(1, 2)
+            nchanges = tot_changes(changes)
+            ym_date = parse(date).strftime("%Y-%m")
+            if ym_date[:4] == year:
+                print(ym_date, nchanges)
+
+
+if __name__ == "__main__":
+    get_min_max_amount_of_commits(year="2018")
