@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
 """Bite 184. Analyze some Bite stats data."""
 
 import os
+from collections import Counter, defaultdict
 from csv import DictReader
 from urllib.request import urlretrieve
 
@@ -17,7 +19,9 @@ class BiteStats:
 
     def _load_data(self, data) -> list:
         """Resolve data into rows."""
-        return []
+        with open(data, encoding="utf-8") as csvfile:
+            rows = list(DictReader(csvfile))
+        return rows
 
     def __init__(self, data=DATA):
         """Save data in instance local."""
@@ -34,14 +38,28 @@ class BiteStats:
     @property
     def number_users_active(self) -> int:
         """Get the number of unique users in the data set."""
+        userlist = [row["user"] for row in self.rows]
+        users = set(userlist)
+        return len(users)
 
     @property
     def number_users_solving_bites(self) -> int:
         """Get the number of unique users that resolved one or more Bites."""
+        userlist = [row["user"] for row in self.rows if row["completed"]]
+        users = set(userlist)
+        return len(users)
 
     @property
     def top_bite_by_number_of_clicks(self) -> str:
         """Get the Bite that got accessed the most (= in most rows)."""
+        naccesses: defaultdict = defaultdict(int)
+        for row in self.rows:
+            bite = row["bite"]
+            naccesses[bite] += 1
+        count_accesses = Counter(naccesses)
+        most_common = count_accesses.most_common(1).pop()
+        bite = most_common[0]
+        return bite
 
     @property
     def top_user_by_bites_completed(self) -> str:
@@ -49,4 +67,4 @@ class BiteStats:
 
 
 if __name__ == "__main__":
-    print(BiteStats().rows)
+    print("Okay")
