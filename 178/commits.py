@@ -1,13 +1,11 @@
-#!/usr/bin/env python3
 """Bite 178. Parse PyBites blog git commit log."""
 
 import os
 import re
-from collections import Counter
+from collections import Counter, defaultdict
 from typing import Tuple
 from urllib.request import urlretrieve
 
-from collections import defaultdict, Counter
 from dateutil.parser import parse
 
 commits = os.path.join(os.getenv("TMP", "/tmp"), "commits")
@@ -51,15 +49,11 @@ def get_min_max_amount_of_commits(
             match = log_pat.match(line)
             date, changes = match.group(1, 2)
             ym_date = parse(date).strftime("%Y-%m")
-            if year and ym_date[:4] != year:
+            if year and ym_date[:4] != str(year):
                 continue
             nchanges = tot_changes(changes)
             nchanges_per_month[ym_date] += nchanges
-        nchanges_per_month = Counter(nchanges_per_month)
-        least = nchanges_per_month.most_common()[-1]
-        most = nchanges_per_month.most_common(1)[0]
+        changes_per_month = Counter(nchanges_per_month)
+        least = changes_per_month.most_common()[-1]
+        most = changes_per_month.most_common(1)[0]
         return (least[0], most[0])
-
-
-if __name__ == "__main__":
-    get_min_max_amount_of_commits(year="2019")
