@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Bite 184. Analyze some Bite stats data."""
 
 import os
@@ -35,31 +34,27 @@ class BiteStats:
     @property
     def number_bites_accessed(self) -> int:
         """Get the number of unique Bites accessed."""
-        bites = set([row["bite"] for row in self.rows])
+        bites = {row["bite"] for row in self.rows}
         return len(bites)
 
     @property
     def number_bites_resolved(self) -> int:
         """Get the number of unique Bites resolved (completed=True)."""
-
         resolved = self.resolved()
-        bytes = [row["bite"] for row in resolved]
-        unique_bytes = set(bytes)
-        return len(unique_bytes)
+        bites = {row["bite"] for row in resolved}
+        return len(bites)
 
     @property
     def number_users_active(self) -> int:
         """Get the number of unique users in the data set."""
-        users = [row["user"] for row in self.rows]
-        unique_users = set(users)
-        return len(unique_users)
+        users = {row["user"] for row in self.rows}
+        return len(users)
 
     @property
     def number_users_solving_bites(self) -> int:
         """Get the number of unique users that resolved one or more Bites."""
         resolved = self.resolved()
-        users = [row["user"] for row in resolved]
-        unique_users = set(users)
+        users = {row["user"] for row in resolved}
         return len(users)
 
     @property
@@ -86,7 +81,3 @@ class BiteStats:
         most_common = count_completed.most_common(1).pop()
         user = most_common[0]
         return user
-
-
-if __name__ == "__main__":
-    print(BiteStats().number_bites_resolved)
