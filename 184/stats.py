@@ -27,26 +27,39 @@ class BiteStats:
         """Save data in instance local."""
         self.rows = self._load_data(data)
 
+    def resolved(self) -> list:
+        """Return rows completed."""
+        completed_rows = [row for row in self.rows if row["completed"] == "True"]
+        return completed_rows
+
     @property
     def number_bites_accessed(self) -> int:
         """Get the number of unique Bites accessed."""
+        bites = set([row["bite"] for row in self.rows])
+        return len(bites)
 
     @property
     def number_bites_resolved(self) -> int:
         """Get the number of unique Bites resolved (completed=True)."""
 
+        resolved = self.resolved()
+        bytes = [row["bite"] for row in resolved]
+        unique_bytes = set(bytes)
+        return len(unique_bytes)
+
     @property
     def number_users_active(self) -> int:
         """Get the number of unique users in the data set."""
-        userlist = [row["user"] for row in self.rows]
-        users = set(userlist)
-        return len(users)
+        users = [row["user"] for row in self.rows]
+        unique_users = set(users)
+        return len(unique_users)
 
     @property
     def number_users_solving_bites(self) -> int:
         """Get the number of unique users that resolved one or more Bites."""
-        userlist = [row["user"] for row in self.rows if row["completed"]]
-        users = set(userlist)
+        resolved = self.resolved()
+        users = [row["user"] for row in resolved]
+        unique_users = set(users)
         return len(users)
 
     @property
@@ -64,7 +77,16 @@ class BiteStats:
     @property
     def top_user_by_bites_completed(self) -> str:
         """Get the user that completed the most Bites."""
+        rows = self.resolved()
+        completed: defaultdict = defaultdict(int)
+        for row in rows:
+            user = row["user"]
+            completed[user] += 1
+        count_completed = Counter(completed)
+        most_common = count_completed.most_common(1).pop()
+        user = most_common[0]
+        return user
 
 
 if __name__ == "__main__":
-    print("Okay")
+    print(BiteStats().number_bites_resolved)
