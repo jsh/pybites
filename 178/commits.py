@@ -7,6 +7,7 @@ from collections import Counter
 from typing import Tuple
 from urllib.request import urlretrieve
 
+from collections import defaultdict, Counter
 from dateutil.parser import parse
 
 commits = os.path.join(os.getenv("TMP", "/tmp"), "commits")
@@ -44,15 +45,21 @@ def get_min_max_amount_of_commits(
     """
     log_pat = re.compile(r"\S+:\s+(.*)\s+\|\s+.*changed, (.*)$")
     # 31 insertions(+), 2 deletions(-)
+    nchanges_per_month = defaultdict(int)
     with open(commit_log, encoding="utf-8") as f_in:
         for line in f_in:
             match = log_pat.match(line)
             date, changes = match.group(1, 2)
-            nchanges = tot_changes(changes)
             ym_date = parse(date).strftime("%Y-%m")
-            if ym_date[:4] == year:
-                print(ym_date, nchanges)
+            if year and ym_date[:4] != year:
+                continue
+            nchanges = tot_changes(changes)
+            nchanges_per_month[ym_date] += nchanges
+        nchanges_per_month = Counter(nchanges_per_month)
+        least = nchanges_per_month.most_common()[-1]
+        most = nchanges_per_month.most_common(1)[0]
+        return (least[0], most[0])
 
 
 if __name__ == "__main__":
-    get_min_max_amount_of_commits(year="2018")
+    get_min_max_amount_of_commits(year="2019")
