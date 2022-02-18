@@ -60,6 +60,32 @@ def import_data() -> None:
 import_data()
 
 
+def query(
+    name=None,
+    year=None,
+    first_year=None,
+    team=None,
+    college=None,
+    active=None,
+    games=None,
+    avg_min=None,
+    avg_points=None,
+    operator="LIKE",
+):
+    """Query the sqlite db."""
+    argv = locals()
+    del argv["operator"]
+
+    sql = f"SELECT * FROM players"
+    params = []
+    for key, value in argv.items():
+        if value is not None:
+            sql += f" WHERE {key} {operator} ?"
+            params.append(value)
+    cur.execute(sql, params)
+    return cur.fetchall()
+
+
 def player_with_max_points_per_game() -> str:
     """The player with highest average points per game.
 
@@ -70,7 +96,8 @@ def player_with_max_points_per_game() -> str:
 
 def number_of_players_from_duke() -> int:
     """Return the number of players with college == Duke University."""
-    return 69
+    duke_players = query(college="Duke University")
+    return len(duke_players)
 
 
 def avg_years_active_players_stanford() -> float:
@@ -78,7 +105,7 @@ def avg_years_active_players_stanford() -> float:
 
     ("active" column)  Round to two digits.
     """
-    return 1.00
+    return round(1.00, 2)
 
 
 def year_with_most_new_players() -> int:
@@ -86,8 +113,9 @@ def year_with_most_new_players() -> int:
 
     Hint: you can use GROUP BY on the year column.
     """
-    return 1984
+    return 1900
 
 
 if __name__ == "__main__":
-    print("Hello")
+    print(query(name="Michael Jordan"))
+    print(query(college="Duke University", operator="="))
