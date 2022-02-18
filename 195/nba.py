@@ -8,6 +8,7 @@ import sqlite3
 import string
 from collections import namedtuple
 from pathlib import Path
+from statistics import mean
 
 import requests
 
@@ -71,12 +72,14 @@ def query(
     avg_min=None,
     avg_points=None,
     operator="LIKE",
+    fields="*"
 ):
     """Query the sqlite db."""
     argv = locals()
     del argv["operator"]
+    del argv["fields"]
 
-    sql = f"SELECT * FROM players"
+    sql = f"SELECT {fields} FROM players"
     params = []
     for key, value in argv.items():
         if value is not None:
@@ -107,11 +110,9 @@ def avg_years_active_players_stanford() -> float:
 
     ("active" column)  Round to two digits.
     """
-    college = "Stanford University"
-    sql = f"SELECT active FROM players WHERE college LIKE ?"
-    cur.execute(sql, ["%Stanford%"])
-    active_years = [int(entry[0]) for entry in cur.fetchall()]
-    ave_active_years = sum(active_years)/len(active_years)
+    active_years = query(fields="active", college="Stanford University")
+    active_years = [int(entry[0]) for entry in active_years]
+    ave_active_years = mean(active_years)
     return round(ave_active_years, 2)
 
 
