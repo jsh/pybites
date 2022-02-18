@@ -91,7 +91,9 @@ def player_with_max_points_per_game() -> str:
 
     (don't forget to CAST to numeric in your SQL query)
     """
-    return "Jeff Haemer"
+    sql = f"SELECT name, MAX(CAST(avg_points AS REAL)) FROM players"
+    cur.execute(sql)
+    return cur.fetchall().pop()[0]
 
 
 def number_of_players_from_duke() -> int:
@@ -117,5 +119,6 @@ def year_with_most_new_players() -> int:
 
 
 if __name__ == "__main__":
-    print(query(name="Michael Jordan"))
-    print(query(college="Duke University", operator="="))
+    print(player_with_max_points_per_game())
+    #print(query(name="Michael Jordan"))
+    #print(query(college="Duke University", operator="="))
