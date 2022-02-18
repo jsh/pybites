@@ -107,7 +107,12 @@ def avg_years_active_players_stanford() -> float:
 
     ("active" column)  Round to two digits.
     """
-    return round(1.00, 2)
+    college = "Stanford University"
+    sql = f"SELECT active FROM players WHERE college LIKE ?"
+    cur.execute(sql, ["%Stanford%"])
+    active_years = [int(entry[0]) for entry in cur.fetchall()]
+    ave_active_years = sum(active_years)/len(active_years)
+    return round(ave_active_years, 2)
 
 
 def year_with_most_new_players() -> int:
@@ -119,6 +124,7 @@ def year_with_most_new_players() -> int:
 
 
 if __name__ == "__main__":
-    print(player_with_max_points_per_game())
+    print(avg_years_active_players_stanford())
+    #print(player_with_max_points_per_game())
     #print(query(name="Michael Jordan"))
     #print(query(college="Duke University", operator="="))
