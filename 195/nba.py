@@ -1,12 +1,12 @@
-#!/usr/bin/env python3
 """Bite 195. Analyze NBA Data with sqlite3."""
+# pylint: disable=unused-argument,too-many-locals,too-many-arguments
 
 import csv
 import os
 import random
 import sqlite3
 import string
-from collections import namedtuple
+from collections import Counter, namedtuple
 from pathlib import Path
 from statistics import mean
 
@@ -72,7 +72,7 @@ def query(
     avg_min=None,
     avg_points=None,
     operator="LIKE",
-    fields="*"
+    fields="*",
 ):
     """Query the sqlite db."""
     argv = locals()
@@ -120,11 +120,9 @@ def year_with_most_new_players() -> int:
 
     Hint: you can use GROUP BY on the year column.
     """
-    return 1900
-
-
-if __name__ == "__main__":
-    #print(avg_years_active_players_stanford())
-    print(player_with_max_points_per_game())
-    #print(query(name="Michael Jordan"))
-    #print(query(college="Duke University", operator="="))
+    sql = "SELECT year, COUNT(*) FROM players GROUP BY year"
+    cur.execute(sql)
+    new_per_year: Counter = Counter()
+    for year, count in cur.fetchall():
+        new_per_year[int(year)] = count
+    return new_per_year.most_common(1).pop()[0]
