@@ -8,12 +8,12 @@ from pathlib import Path
 from typing import Dict
 from urllib.request import urlretrieve
 
-data = "https://bites-data.s3.us-east-2.amazonaws.com/bite_levels.csv"
+DATA = "https://bites-data.s3.us-east-2.amazonaws.com/bite_levels.csv"
 TMP = Path(os.getenv("TMP", "/tmp"))
-stats = TMP / "bites.csv"
+STATS_CSV = TMP / "bites.csv"
 
-if not stats.exists():
-    urlretrieve(data, stats)
+if not STATS_CSV.exists():
+    urlretrieve(DATA, STATS_CSV)
 
 
 def difficulty(row: Dict[str, str]) -> float:
@@ -21,7 +21,7 @@ def difficulty(row: Dict[str, str]) -> float:
     return float(row["Difficulty"])
 
 
-def get_most_complex_bites(N=10, stats=stats) -> list[str]:
+def get_most_complex_bites(nbites=10, stats=STATS_CSV) -> list[str]:
     """Parse the bites.csv file (= stats variable passed in).
 
     see example output in the Bite description.
@@ -34,7 +34,7 @@ def get_most_complex_bites(N=10, stats=stats) -> list[str]:
         reader = csv.DictReader(cvsfile, delimiter=";")
         rows = [row for row in reader if row["Difficulty"] != "None"]
     bites = sorted(rows, key=difficulty, reverse=True)
-    hardest = [bite["Bite"] for bite in bites[:N]]
+    hardest = [bite["Bite"] for bite in bites[:nbites]]
     pat = re.compile(r"Bite (\d+)\. .*")
     hardest_list = []
     for bite in hardest:
