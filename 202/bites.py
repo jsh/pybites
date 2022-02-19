@@ -5,7 +5,7 @@ import csv
 import os
 import re
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 from urllib.request import urlretrieve
 
 DATA = "https://bites-data.s3.us-east-2.amazonaws.com/bite_levels.csv"
@@ -21,7 +21,7 @@ def difficulty(row: Dict[str, str]) -> float:
     return float(row["Difficulty"])
 
 
-def get_most_complex_bites(nbites=10, stats=STATS_CSV) -> list[str]:
+def get_most_complex_bites(nbites=10, stats=STATS_CSV) -> List[str]:
     """Parse the bites.csv file (= stats variable passed in).
 
     see example output in the Bite description.
