@@ -3,13 +3,14 @@
 
 import csv
 import re
-from collections import Counter, namedtuple
+from collections import Counter, namedtuple, defaultdict
 
 import requests
 
 MARVEL_CSV = "https://raw.githubusercontent.com/pybites/marvel_challenge/master/marvel-wikia-data.csv"  # noqa E501
 
 Character = namedtuple("Character", "pid name sid align sex appearances year")
+Full_character = namedtuple("Character", "pid name sid align eye hair sex gsm alive appearances first_appearance year")
 
 
 # csv parsing code provided so this Bite can focus on the parsing
@@ -20,6 +21,29 @@ def _get_csv_data():
     with requests.Session() as session:
         return session.get(MARVEL_CSV).content.decode("utf-8")
 
+
+def load_raw_data():
+    """Convert marvel.csv into a sequence of Character namedtuples.
+    Use all fields
+    """
+    content = _get_csv_data()
+    reader = csv.DictReader(content.splitlines(), delimiter=",")
+    for row in reader:
+        print(row)
+        yield Full_character(
+            pid=row["page_id"],
+            name=row["name"],
+            sid=row["ID"],
+            align=row["ALIGN"],
+            eye=row["EYE"],
+            hair=row["HAIR"],
+            sex=row["SEX"],
+            gsm=row["GSM"],
+            alive=row["ALIVE"],
+            appearances=row["APPEARANCES"],
+            first_appearance=row["FIRST APPEARANCE"],
+            year=row["Year"],
+        )
 
 def load_data():
     """Convert marvel.csv into a sequence of Character namedtuples.
@@ -52,6 +76,9 @@ def most_popular_characters(characters=characters, top=5):
 
     Return top n characters (default 5)
     """
+    filtered_chars = [character for character in characters if character.appearances] 
+    sorted_chars = sorted(filtered_chars, key = lambda x: int(x.appearances), reverse=True)
+    return [char.name for char in sorted_chars[:top]]
 
 
 def max_and_min_years_new_characters(characters=characters):
@@ -61,7 +88,14 @@ def max_and_min_years_new_characters(characters=characters):
     or the 'year' attribute of the namedtuple,
     return a tuple of (max_year, min_year)
     """
-
+    new_chars = defaultdict(int)
+    for character in characters:
+        year = character.year
+        new_chars[year] += 1
+    sort_by_new = [year for year, new in sorted(new_chars.items(), key = lambda item: item[1]) if year]
+    max = sort_by_new[-1]
+    min = sort_by_new[0]
+    return (min, max)
 
 def get_percentage_female_characters(characters=characters):
     """Get the percentage of female characters.
@@ -74,5 +108,6 @@ def get_percentage_female_characters(characters=characters):
     """
 
 
+
 if __name__ == "__main__":
-    print("hello, world")
+    print(max_and_min_years_new_characters())
