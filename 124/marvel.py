@@ -29,7 +29,6 @@ def load_raw_data():
     content = _get_csv_data()
     reader = csv.DictReader(content.splitlines(), delimiter=",")
     for row in reader:
-        print(row)
         yield Full_character(
             pid=row["page_id"],
             name=row["name"],
@@ -67,8 +66,11 @@ def load_data():
 
 characters = list(load_data())
 
+# temporary
+half_size = int(len(characters)/2)
 
-# start coding
+half_characters = characters[:half_size]
+
 
 
 def most_popular_characters(characters=characters, top=5):
@@ -93,9 +95,9 @@ def max_and_min_years_new_characters(characters=characters):
         year = character.year
         new_chars[year] += 1
     sort_by_new = [year for year, new in sorted(new_chars.items(), key = lambda item: item[1]) if year]
-    max = sort_by_new[-1]
-    min = sort_by_new[0]
-    return (min, max)
+    max_year = sort_by_new[-1]
+    min_year = sort_by_new[0]
+    return (max_year, min_year)
 
 def get_percentage_female_characters(characters=characters):
     """Get the percentage of female characters.
@@ -106,8 +108,12 @@ def get_percentage_female_characters(characters=characters):
     Agender, and Genderfluid Characters.
     Return the result rounded to 2 digits
     """
-
-
+    cset = {character for character in characters if character.sex}
+    females = 0
+    for character in cset:
+        if "Female" in character.sex:
+            females += 1
+    return round(100*(females/len(cset)), 2)
 
 if __name__ == "__main__":
-    print(max_and_min_years_new_characters())
+    print(get_percentage_female_characters())
