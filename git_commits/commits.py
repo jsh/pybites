@@ -6,6 +6,9 @@ import git
 from git import Repo
 import sys
 
+def set_repo(path: str):
+    return Repo(path)
+
 def clone_from_remote(url: str, local: Path) -> Repo:
     """Get a local copy of a remote repo."""
     if local.is_dir():
@@ -28,5 +31,11 @@ def count_commits(repo: Repo) -> int:
 
 def first_commit(repo: Repo) -> str:
     """Return the SHA1 of the first commit."""
+    head = repo.heads.master
+    return str(head.commit)
+
+
+def last_commit(repo: Repo) -> str:
+    """Return the SHA1 of the last commit."""
     commits = list(repo.iter_commits("master"))
-    return str(commits[-1])
+    return str(commits[0])
