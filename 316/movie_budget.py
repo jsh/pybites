@@ -1,5 +1,6 @@
 """Bite 316. To rent or to stream movies?"""
 
+from collections import defaultdict
 from datetime import date
 from typing import Dict, NamedTuple, Sequence
 
@@ -17,6 +18,11 @@ STREAMING_COST_PER_MONTH = 12
 STREAM, RENT = "stream", "rent"
 
 
+def choice(cost: int) -> str:
+    """Choose 'rent' unless the cost is more than streaming cost."""
+    return "rent" if cost <= STREAMING_COST_PER_MONTH else "stream"
+
+
 def rent_or_stream(
     renting_history: RentingHistory,
     streaming_cost_per_month: int = STREAMING_COST_PER_MONTH,
@@ -31,4 +37,8 @@ def rent_or_stream(
 
     Check out the tests for examples.
     """
-    return {"2022-02": "rent"}
+    price_for_month: defaultdict = defaultdict(int)
+    for movie in renting_history:
+        price_for_month[str(movie.date)[:-3]] += movie.price
+    ans = {month: choice(cost) for month, cost in price_for_month.items()}
+    return ans
