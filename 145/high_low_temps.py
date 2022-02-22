@@ -69,30 +69,31 @@ def high_low_record_breakers_for_2015() -> Tuple[STATION, STATION]:
     low = STATION("USW00094889", date(2015, 2, 20), -34.3)
     return (high, low)
 
+
 def header(hdr: str):
-    print("\n", hdr.center(os.get_terminal_size().columns))
+    """Print a centered header."""
+    print("\n", f"== {hdr.title()} ==".center(os.get_terminal_size().columns))
 
 
 if __name__ == "__main__":
     path = fetch_csvfile()
     df = create_dataframe(path)
-    df_two = df[(df['Date'] < '2016-01-01') & (df['Element'] == 'TMIN')]
-    df = df[(df['Date'] < '2016-01-01')]
-    df_min = df[(df['Element'] == 'TMIN')]
-    df_max = df[(df['Element'] == 'TMAX')]
-    df_before = df[(df['Date'] < '2015-01-01')]
-    df_after = df[(df['Date'] >= '2015-01-01')]
-    header("== All records ==")
+    df_two = df[(df["Date"] < "2016-01-01") & (df["Element"] == "TMIN")]
+    df = df[(df["Date"] < "2016-01-01")]
+    df_min = df[(df["Element"] == "TMIN")]
+    df_max = df[(df["Element"] == "TMAX")]
+    df_before = df[(df["Date"] < "2015-01-01")]
+    df_after = df[(df["Date"] >= "2015-01-01")]
+    header("all records")
     print(df)
-    header("== Maxima ==")
+    header("maxima")
     print(df_max)
-    header("== Minima ==")
+    header("minima")
     print(df_min)
     print()
     print("df_min identical to df_two:", id(df_min) == id(df_two))
     print("df_min same shape and contents as df_two:", df_min.equals(df_two))
-    header("== Before 2015 ==")
+    header("before 2015")
     print(df_before)
-    header("== In 2015 ==")
+    header("in 2015")
     print(df_after)
-
