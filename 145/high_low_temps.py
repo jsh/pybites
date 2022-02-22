@@ -1,14 +1,33 @@
 #!/usr/bin/env python3
 """Bite 145. Record Breakers."""
 
+import os
 from collections import namedtuple
 from datetime import date
+from pathlib import Path
 from typing import Tuple
+from urllib.request import urlretrieve
 
 import pandas as pd
 
 DATA_FILE = "https://bites-data.s3.us-east-2.amazonaws.com/weather-ann-arbor.csv"
 STATION = namedtuple("STATION", "ID Date Value")
+TMP = Path(os.getenv("TMP", "/tmp"))
+TMP = Path(".")
+WEATHER_CSV = TMP / "weather-ann-arbor.csv"
+
+
+def fetch_csvfile(url: str = DATA_FILE, path: Path = WEATHER_CSV):
+    """Fetch remote data to local file."""
+    if not path.exists():
+        urlretrieve(url, path)
+    return path
+
+
+def create_dataframe(path: Path) -> pd.core.frame.DataFrame:
+    """Create dataframe from csv file."""
+    dataframe = pd.read_csv(path)
+    return dataframe
 
 
 def high_low_record_breakers_for_2015() -> Tuple[STATION, STATION]:
@@ -45,6 +64,12 @@ def high_low_record_breakers_for_2015() -> Tuple[STATION, STATION]:
        * Return those as STATION namedtuples, (high_2015, low_2015)
     """
     # hard-wired to pass test
+
     high = STATION("USW00014853", date(2015, 7, 29), 36.1)
     low = STATION("USW00094889", date(2015, 2, 20), -34.3)
     return (high, low)
+
+
+if __name__ == "__main__":
+    path = fetch_csvfile()
+    print(create_dataframe(path))
