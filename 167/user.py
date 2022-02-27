@@ -35,6 +35,7 @@ class User:
 
     def __str__(self) -> str:
         """Return printable version of object."""
+        return f"{self.get_full_name} ({self.username})"
 
     def __repr__(self) -> str:
         """
@@ -43,3 +44,4 @@ class User:
         Don't hardcode the class name, hint: use a
         special attribute of self.__class__ ...
         """
+        return f'{self.__class__.__name__}("{self.first_name}", "{self.last_name}")'
