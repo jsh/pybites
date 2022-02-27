@@ -41,11 +41,16 @@ class Promo:
         If all
         Bites are done, raise a NoBitesAvailable exception
         """
-        return 7
+        remaining_bites = self.all_bites.keys() - self.bites_done
+        if not remaining_bites:
+            raise NoBitesAvailable
+        return random.choice(list(remaining_bites))
 
     def new_bite(self) -> int:
         """Get  a random Bite using _pick_random_bite.
 
         Add it to self.bites_done, then return it
         """
-        return 7
+        random_bite = self._pick_random_bite()
+        self.bites_done.add(random_bite)
+        return random_bite
