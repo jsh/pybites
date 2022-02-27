@@ -13,7 +13,6 @@ import pandas as pd
 DATA_FILE = "https://bites-data.s3.us-east-2.amazonaws.com/weather-ann-arbor.csv"
 STATION = namedtuple("STATION", "ID Date Value")
 TMP = Path(os.getenv("TMP", "/tmp"))
-TMP = Path(".")
 WEATHER_CSV = TMP / "weather-ann-arbor.csv"
 
 
@@ -63,7 +62,29 @@ def high_low_record_breakers_for_2015() -> Tuple[STATION, STATION]:
        temperatures
        * Return those as STATION namedtuples, (high_2015, low_2015)
     """
+
+    # 1. Create a DataFrame from the DATA_FILE dataset.
+
     # hard-wired to pass test
+    path = fetch_csvfile()
+    df = create_dataframe(path)
+
+    # 2. Manipulate the data to extract the following:
+    df = df[("2014-12-31" < df["Date"]) & (df["Date"] < "2016-01-01")]
+    #    * Extract highest temperatures for each day / station pair between 2005-2015
+    df_max = df[(df["Element"] == "TMAX")]
+    #    * Extract lowest temperatures for each  day / station  between 2005-2015
+    df_min = df[(df["Element"] == "TMIN")]
+
+    #    * Remove February 29th from the dataset to work with only 365 days
+    df_shd = df[df["Date"].str.contains("-02-29")]
+    df.drop(df_shd.index, inplace=True)
+
+    # 3. Separate data into two separate DataFrames:
+    #    * high/low temperatures between 2005-2014
+    df_before = df[(df["Date"] < "2015-01-01")]
+    ##     * high/low temperatures for 2015
+    df_after = df[(df["Date"] >= "2015-01-01")]
 
     high = STATION("USW00014853", date(2015, 7, 29), 36.1)
     low = STATION("USW00094889", date(2015, 2, 20), -34.3)
@@ -71,29 +92,37 @@ def high_low_record_breakers_for_2015() -> Tuple[STATION, STATION]:
 
 
 def header(hdr: str):
-    """Print a centered header."""
+    """Print a centered header. Utility routine."""
     print("\n", f"== {hdr.title()} ==".center(os.get_terminal_size().columns))
 
 
 if __name__ == "__main__":
     path = fetch_csvfile()
     df = create_dataframe(path)
-    df_two = df[(df["Date"] < "2016-01-01") & (df["Element"] == "TMIN")]
-    df = df[(df["Date"] < "2016-01-01")]
-    df_min = df[(df["Element"] == "TMIN")]
-    df_max = df[(df["Element"] == "TMAX")]
-    df_before = df[(df["Date"] < "2015-01-01")]
-    df_after = df[(df["Date"] >= "2015-01-01")]
-    header("all records")
+    header("Whole thing")
     print(df)
-    header("maxima")
-    print(df_max)
-    header("minima")
-    print(df_min)
-    print()
-    print("df_min identical to df_two:", id(df_min) == id(df_two))
-    print("df_min same shape and contents as df_two:", df_min.equals(df_two))
-    header("before 2015")
-    print(df_before)
-    header("in 2015")
-    print(df_after)
+    df_shd = df[df["Date"].str.contains("-02-29")]
+    header("Excludes")
+    print(df_shd)
+    df.drop(df_shd.index, inplace=True)
+    header("subtracted")
+    print(df)
+    # df_two = df[(df["Date"] < "2016-01-01") & (df["Element"] == "TMIN")]
+    # df = df[(df["Date"] < "2016-01-01")]
+    # df_min = df[(df["Element"] == "TMIN")]
+    # df_max = df[(df["Element"] == "TMAX")]
+    # df_before = df[(df["Date"] < "2015-01-01")]
+    # df_after = df[(df["Date"] >= "2015-01-01")]
+    # header("all records")
+    # print(df)
+    # header("maxima")
+    # print(df_max)
+    # header("minima")
+    # print(df_min)
+    # print()
+    # print("df_min identical to df_two:", id(df_min) == id(df_two))
+    # print("df_min same shape and contents as df_two:", df_min.equals(df_two))
+    # header("before 2015")
+    # print(df_before)
+    # header("in 2015")
+    # print(df_after)
