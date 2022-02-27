@@ -18,6 +18,7 @@ class User:
 
         Use title case for both.
         """
+        return f"{self.first_name} {self.last_name}".title()
 
     @property
     def username(self) -> str:
@@ -30,6 +31,7 @@ class User:
         If this is your first property, check out:
         https://pybit.es/property-decorator.html
         """
+        return (self.first_name[0] + self.last_name[:7]).lower()
 
     def __str__(self) -> str:
         """Return printable version of object."""
