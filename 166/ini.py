@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
 """Bite 166. Complete a tox ini file parser class."""
 
 import configparser
+from typing import List
 
 
 class ToxIniParser:
@@ -22,7 +22,7 @@ class ToxIniParser:
         return len(self.config.sections())
 
     @property
-    def environments(self) -> list[str]:
+    def environments(self) -> List[str]:
         """Return a list of environments.
 
         (= "envlist" attribute of [tox] section)
@@ -34,17 +34,10 @@ class ToxIniParser:
         return envs
 
     @property
-    def base_python_versions(self) -> list[str]:
+    def base_python_versions(self) -> List[str]:
         """Return a list of all basepython across the ini file."""
         basepythons = set()
         for section in self.config.sections():
             if "basepython" in self.config[section]:
                 basepythons.add(self.config[section]["basepython"])
         return list(basepythons)
-
-
-if __name__ == "__main__":
-    tp = ToxIniParser("some_file.txt")
-    print(tp.number_of_sections)
-    print(tp.environments)
-    print(tp.base_python_versions)
