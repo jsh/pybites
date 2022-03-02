@@ -27,8 +27,9 @@ class ToxIniParser:
 
         (= "envlist" attribute of [tox] section)
         """
-        #envs = self.config["tox"]["envlist"].replace("\n", "").split(",")
-        envs = self.config["tox"]["envlist"].split(",")
+        # envs = self.config["tox"]["envlist"].replace("\n", "").split(",")
+        envlist = self.config["tox"]["envlist"].replace("\n", ",")
+        envs = envlist.split(",")
         envs = [env.strip() for env in envs if env]
         return envs
 
