@@ -1,6 +1,6 @@
 """Bite 24. ABC's and class inheritance."""
 from abc import ABC, abstractmethod
-from typing import List
+from typing import Any, List
 
 
 class Challenge(ABC):
@@ -12,10 +12,11 @@ class Challenge(ABC):
         self.title = title
 
     @abstractmethod
-    def verify(self):
+    def verify(self, something: Any) -> bool:
         """method docstring."""
 
     @property
+    @abstractmethod
     def pretty_title(self):
         """property docstring."""
 
@@ -23,16 +24,34 @@ class Challenge(ABC):
 class BlogChallenge(Challenge):
     """A Challenge with merged prs."""
 
-    def __init__(self, number: int, title: str, prs: List[int]) -> None:
+    def __init__(self, number: int, title: str, merged_prs: List[int]) -> None:
         """Create the object."""
         super().__init__(number, title)
-        self.prs = prs
+        self.merged_prs = merged_prs
+
+    def verify(self, pr: int) -> bool:
+        """Verify pr in merged_prs."""
+        return pr in self.merged_prs
+
+    @property
+    def pretty_title(self) -> str:
+        """Pretty-print blog challenge."""
+        return f"PCC{self.number} - {self.title}"
 
 
 class BiteChallenge(Challenge):
     """Another Challenge with merged prs."""
 
-    def __init__(self, number: int, title: str, prs: List[int]) -> None:
+    def __init__(self, number: int, title: str, result: str) -> None:
         """Create the object."""
         super().__init__(number, title)
-        self.prs = prs
+        self.result = result
+
+    def verify(self, result: str) -> bool:
+        """Verify result is the bite challenge's result."""
+        return result == self.result
+
+    @property
+    def pretty_title(self) -> str:
+        """Pretty-print bite challenge."""
+        return f"Bite {self.number}. {self.title}"
