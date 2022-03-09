@@ -1,5 +1,7 @@
+"""Bite 168. Ninja Rankings."""
+
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List
 
 bites: List[int] = [283, 282, 281, 263, 255, 230, 216, 204, 197, 196, 195]
 names: List[str] = [
@@ -19,7 +21,8 @@ names: List[str] = [
 
 @dataclass
 class Ninja:
-    """
+    """Object that represents a user as a ninja.
+
     The Ninja class will have the following features:
 
     string: name
@@ -27,12 +30,15 @@ class Ninja:
     support <, >, and ==, based on bites
     print out in the following format: [469] bob
     """
-    pass
+
+    name: str
+    bites: int
 
 
 @dataclass
 class Rankings:
-    """
+    """Object to contain rankings of Ninjas.
+
     The Rankings class will have the following features:
 
     method: add() that adds a Ninja object to the rankings
@@ -46,4 +52,3 @@ class Rankings:
             parameter indicating how many Ninjas to pair up
     returns List containing tuples of the paired up Ninja objects
     """
-    pass
